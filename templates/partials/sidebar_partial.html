@@ -1,0 +1,15 @@
+    <div class="sidebar col l2 m3 s12 cyan darken-2 z-depth-3">
+        <div class="sidebar-profile-image">
+            <img class="circle responsive-img hoverable z-depth-1" src="../static/images/no_pic.png">
+        </div>
+        <div>
+            <ul class="collection with-header">
+                <li class="collection-header center-align"><h4>Username</h4></li>
+                <a href="{{ url_for('home') }}" class="collection-item center-align">Home</a>
+                <a href="{{ url_for('profile') }}" class="collection-item center-align">View Profile</a>
+                <a href="{{ url_for('rosters') }}" class="collection-item center-align">View Rosters</a>
+                <a href="{{ url_for('calendar') }}" class="collection-item center-align">View Calendar</a>
+                <a href="{{ url_for('main_page') }}" class="collection-item center-align">Logout</a>
+            </ul>
+        </div>
+    </div>

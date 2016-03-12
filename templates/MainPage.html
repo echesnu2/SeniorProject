@@ -1,0 +1,202 @@
+{% extends "template.html" %}
+{% block header %}
+{{ super() }}
+{% endblock header %}
+{% block content %}
+{% include "partials/navbar_partial.html" %}
+
+
+<!--Import mainPage.css-->
+<link rel="stylesheet" href="../static/css/mainPage.css">
+
+<!-- HTML for mainpage layout-->
+<div class="mainBackgroundDiv grey lighten-3 z-depth-3"></div>
+<div class="mainPictureContainer z-depth-3">
+    <img id="mainPictureImage" src="http://i.telegraph.co.uk/multimedia/archive/03235/potd-husky_3235255k.jpg"
+         class="mainPicture responsive-img">
+    <div id="mainPictureOverlay" class="mainPicture black">
+        <div class="overlayTextContainer">
+            <div class="section white-text">
+                <h2>Do Activities.</h2>
+                <p style="font-size: 1.2em">Cheesy phrase about joining our community.</p>
+            </div>
+            <div class="divider white"></div>
+            <div class="row" style="margin-top: 1em">
+                <a class=" col l5 btn-large waves-effect waves-light teal darken-3 modal-trigger"
+                   href="#modal2">Login</a>
+                <a class=" col l5 btn-large waves-effect waves-light offset-l2 teal darken-3 modal-trigger"
+                   href="#modal1">Sign-Up</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mainTextBoxContainer">
+    <div class="col mainSideTextbox">
+        <div class="card">
+            <div class="card-image">
+                <img src="http://i.telegraph.co.uk/multimedia/archive/03235/potd-husky_3235255k.jpg">
+                <span class="card-title">Phrase Thing</span>
+            </div>
+            <div class="card-content black white-text">
+                <p>Some text will go here, we just don't know what yet.</p>
+            </div>
+            <div class="card-action">
+                <a href="#">Link</a>
+            </div>
+        </div>
+    </div>
+    <div class="col mainCenterTextbox">
+        <div class="card">
+            <div class="card-image">
+                <img src="http://i.telegraph.co.uk/multimedia/archive/03235/potd-husky_3235255k.jpg">
+                <span class="card-title">Phrase Thing</span>
+            </div>
+            <div class="card-content black white-text">
+                <p>Some text will go here, we just don't know what yet.</p>
+            </div>
+            <div class="card-action">
+                <a href="#">Link</a>
+            </div>
+        </div>
+    </div>
+    <div class="col mainSideTextbox">
+        <div class="card">
+            <div class="card-image">
+                <img src="http://i.telegraph.co.uk/multimedia/archive/03235/potd-husky_3235255k.jpg">
+                <span class="card-title">Phrase Thing</span>
+            </div>
+            <div class="card-content black white-text">
+                <p>Some text will go here, we just don't know what yet.</p>
+            </div>
+            <div class="card-action">
+                <a href="#">Link</a>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="page-footer cyan darken-4">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">Footer Stuff</h5>
+                <p class="grey-text text-lighten-4">Hello</p>
+            </div>
+            <div class="col l4 offset-l2 s12">
+                <h5 class="white-text">Links</h5>
+                <ul>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+                    <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            © 2014 Copyright Text
+            <a class="grey-text text-lighten-4 right" href="#!"></a>
+        </div>
+    </div>
+</footer>
+
+<div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <h4>Sign-up!</h4>
+        <form class="col s12" method="post" action="{{ url_for('main_page') }}">
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="first_name" name="first_name" type="text" class="validate">
+                    <label for="first_name">First Name</label>
+                </div>
+                <div class="input-field col s6">
+                    <input id="last_name" name="last_name" type="text" class="validate">
+                    <label for="last_name">Last Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="email" name="email" type="email" class="validate">
+                    <label for="email">Email</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="confirmEmail" name="conifirmEmail" type="email" class="validate">
+                    <label for="confirmEmail">Confirm Email</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="username" name="username" type="text" class="validate">
+                    <label for="username">Username</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s6">
+                    <input id="password" name="password" type="password" class="validate">
+                    <label for="password">Password</label>
+                </div>
+                <div class="input-field col s6">
+                    <input id="confirmPassword" name="confirmPassword" type="password" class="validate">
+                    <label for="confirmPassword">Confirm Password</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="s12 center">
+                    <input type="submit" class="modal-action btn-flat cyan darken-3 white-text"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class=" modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+    </div>
+</div>
+
+<div id="modal2" class="modal modal-fixed-footer">
+    <div class="modal-content">
+        <h4>Sign-in</h4>
+        <form class="col s12" method="post" action="{{ url_for('main_page') }}">
+            <div class="row">
+                <div class="input-field col s6 offset-s3">
+                    <input id="username" name="username-login" type="text" class="validate">
+                    <label for="username">Username</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s6 offset-s3">
+                    <input id="password" name="password-login" type="password" class="validate">
+                    <label for="password">Password</label>
+                </div>
+            </div>
+            {% if error is defined %}
+            <div class="row">
+                <div class="s12 center">
+                    <h5 class="login-error">{{ error }}</h5>
+                </div>
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="s12 center">
+                    <input type="submit" class="modal-action btn-flat cyan darken-3 white-text"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class=" modal-action modal-close waves-effect waves-red btn-flat">Close</a>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+        $('.modal-trigger').leanModal();
+
+        {% if error is defined %}
+            $('#modal2').openModal();
+        {% endif %}
+
+    });
+</script>
+{% endblock content %}

@@ -1,0 +1,16 @@
+.create-event-area {
+    margin-top: 5em;
+}
+
+#map {
+    width: 100%;
+    height:500px;
+}
+
+#pac-input::-webkit-input-placeholder {
+    color: black;
+}
+
+#pac-input::-moz-placeholder {
+    color: black;
+}

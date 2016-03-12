@@ -1,0 +1,1 @@
+SELECT * FROM Activity WHERE category = 50

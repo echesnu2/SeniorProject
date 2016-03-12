@@ -1,0 +1,47 @@
+{% extends "template.html" %}
+{% block header %}
+{{ super() }}
+{% endblock header %}
+{% block content %}
+
+ <!-- Link to Results page css-->
+<link id="results-stylesheet" rel="stylesheet" href="../static/css/ResultsPage.css">
+
+{% include "partials/navbar_partial.html" %}
+<div class="row">
+{% include "partials/sidebar_partial.html" %}
+{% include "partials/searchFilter_partial.html" %}
+</div>
+
+<div class="row">
+{% include "partials/searchFilter_partial.html" %}
+</div>
+
+<script>
+    function adjustStyle(width) {
+        width = parseInt(width);
+        if (width < 600) {
+            $(".sidebar").css("position", "relative");
+        } else {
+            $(".sidebar").css("position", "fixed");
+        }
+    }
+
+    $(function () {
+        adjustStyle($(this).width());
+        $(window).resize(function () {
+            adjustStyle($(this).width());
+        });
+    });
+
+    $('.datepicker').pickadate({
+        selectMonths: true, // Creates a dropdown to control month
+    });
+
+    $(document).ready(function() {
+        $('select').material_select();
+    });
+</script>
+
+{% include "partials/resultsDiv_js.html" %}
+{% endblock content %}

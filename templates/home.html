@@ -1,0 +1,45 @@
+{% extends "template.html" %}
+{% block header %}
+{{ super() }}
+{% endblock header %}
+{% block content %}
+
+<!--Import CSS for home and profile page-->
+<link id="size-stylesheet" rel="stylesheet" href="../static/css/home-profile-style.css">
+
+{% include "partials/navbar_partial.html" %}
+<div class="row">
+{% include "partials/sidebar_partial.html" %}
+    <div class="s6" align="center">
+        <!-- Teal page content  -->
+              <br>
+              <br>
+              <br>
+              <br>
+              <br><br><br>
+              <button class="btn-floating">
+                  <a href="search_results.html">JOIN ACTIVITY</a>
+              </button>
+              <button class="btn-floating">CREATE ACTIVITY</button>
+      </div>
+</div>
+
+<script>
+    function adjustStyle(width) {
+        width = parseInt(width);
+        if (width < 600) {
+            $(".sidebar").css("position", "relative");
+            $(".btn-floating").css("width", "95%");
+            $(".btn-floating").css("border-radius", "5%");
+        } else {
+            $(".sidebar").css("position", "fixed");
+        }
+    }
+    $(function () {
+        adjustStyle($(this).width());
+        $(window).resize(function () {
+            adjustStyle($(this).width());
+        });
+    });
+</script>
+{% endblock content %}

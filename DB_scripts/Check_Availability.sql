@@ -1,0 +1,1 @@
+SELECT available FROM Activity WHERE id = 67890
