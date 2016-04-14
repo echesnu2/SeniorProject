@@ -1,24 +1,23 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask.ext.bcrypt import Bcrypt
 import utilities
 import amm_db
+import datetime
+import calendar
+import time
 
 app = Flask(__name__)
 app.debug = True
-
-# pushed random letters, numbers, symbols: can be changed
-# Used for session
-app.secret_key = 'F847Jsa8sa&320-1=-!@('
-
 bcrypt = Bcrypt(app)
+app.secret_key = 'test'
 
-db = amm_db.AmmDB()
+db = amm_db.AmmDB('ammdb.cwwnkw8gimhn.us-west-2.rds.amazonaws.com', 'adminadmin')
 
 
 @app.route('/', methods=['GET', 'POST'])
 def main_page():
     session['userID'] = None
-
+    db.get_last_id()
     if request.method == 'POST':
         if request.form.get('email', None) is not None:
             db.add_user(fn=request.form['first_name'], ln=request.form['last_name'], email=request.form['email'],
@@ -62,13 +61,13 @@ def profile():
             else:
                 if request.form['password'] != '':
                     db.edit_user(session.get('user_id'), email=request.form['u_email'],
-                             fname=request.form['fname'], lname=request.form['lname'],
-                             passwd=bcrypt.generate_password_hash(request.form['password']),
-                                 phone = request.form['phone'])
+                                 fname=request.form['fname'], lname=request.form['lname'],
+                                 passwd=bcrypt.generate_password_hash(request.form['password']),
+                                 phone=request.form['phone'])
                 else:
                     db.edit_user(session.get('user_id'), email=request.form['u_email'],
-                             fname=request.form['fname'], lname=request.form['lname'],
-                             passwd='', phone=request.form['phone'])
+                                 fname=request.form['fname'], lname=request.form['lname'],
+                                 passwd='', phone=request.form['phone'])
 
                 response = 'Updates made to profile!'
                 user_info = db.get_user(session.get('user_id'))
@@ -83,31 +82,115 @@ def create_event():
     if session.get('user_id', None) is None:
         return redirect(url_for('main_page'))
     user_info = db.get_user(session.get('user_id'))
-    return render_template('create_event.html', user=user_info)
+    categories = db.get_activity_type()
+
+    if request.method == 'POST':
+        activity_name = request.form['activity-name']
+        category = request.form['category']
+        private = request.form['private']
+        date = request.form['date']
+        time = request.form['time']
+        duration = request.form['duration']
+        latitude = request.form['lat']
+        longitude = request.form['lng']
+        num_of_players = request.form['num-of-players']
+        skill = request.form['skill-level']
+        datetime = utilities.combine_datetime(date, time)
+
+        db.add_activity(name=activity_name, category=category, datetime=datetime, duration=duration, latitude=latitude,
+                        longitude=longitude, numplayers=num_of_players, skill=skill, private=private, leader=session.get
+                        ('user_id'), available=1)
+        db.add_user_activity(session.get('user_id'), db.get_activity(name=activity_name, category=category, skill=skill,
+                                                                     leader=session.get('user_id')))
+        redirect(url_for('home'))
+
+    return render_template('create_event.html', key=utilities.get_key('google_maps'), user=user_info,
+                           categories=categories)
 
 
-@app.route('/calendar')
-def calendar():
+@app.route('/search', methods=['POST', 'GET'])
+def search():
     if session.get('user_id', None) is None:
         return redirect(url_for('main_page'))
     user_info = db.get_user(session.get('user_id'))
-    return render_template('SearchResultsPage.html', user=user_info)
+    categories = db.get_activity_type()
+
+    if request.method == 'POST':
+        if request.form.get('join', None) is None:
+            activity_name = request.form['activity-name']
+            results = db.get_activity(name=activity_name)
+            return render_template('SearchResultsPage.html', user=user_info, results=results, categories=categories,
+                                   maps_key=utilities.get_key('google_maps'))
+        else:
+            db.add_user_activity(user_info[0]['id'], request.form['activity-id'])
+            utilities.send_email(user_info[0]['email'], 'Activity Joined', 'You joined: ' +
+                                 request.form['activity-name-item'])
+
+            return render_template('SearchResultsPage.html', user=user_info, categories=categories,
+                                   maps_key=utilities.get_key('google_maps'))
+    else:
+        return render_template('SearchResultsPage.html', user=user_info, categories=categories,
+                               maps_key=utilities.get_key('google_maps'))
 
 
-@app.route('/rosters')
+@app.route('/calender')
+def calender():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('main_page'))
+    user_info = db.get_user(session.get('user_id'))
+    date = calendar.Calendar(6).monthdatescalendar(datetime.datetime.utcnow().year, datetime.datetime.utcnow().month)
+
+    act_list = []
+    activities = db.get_user_activity(user_id=user_info[0]['id'])
+    for activity in activities:
+        activity_details = db.get_activity(activity_id=activity['activityid'])[0]
+        activity_details['latitude'] = float(activity_details['latitude'])
+        activity_details['longitude'] = float(activity_details['longitude'])
+        activity_details['time'] = int(time.mktime(activity_details['datetime'].timetuple())) * 1000
+        act_list.append(activity_details)
+
+    return render_template('calender.html', user=user_info, date=date, activities=act_list,
+                           maps_key=utilities.get_key('google_maps'))
+
+
+@app.route('/rosters', methods=['GET', 'POST'])
 def rosters():
     if session.get('user_id', None) is None:
         return redirect(url_for('main_page'))
     user_info = db.get_user(session.get('user_id'))
-    return render_template('RostersPage.html', user=user_info)
 
+    act_list = []
+    activities = db.get_user_activity(user_id=user_info[0]['id'])
+    for activity in activities:
+        activity_details = db.get_activity(activity_id=activity['activityid'])[0]
+        activity_details['latitude'] = float(activity_details['latitude'])
+        activity_details['longitude'] = float(activity_details['longitude'])
+        activity_details['time'] = int(time.mktime(activity_details['datetime'].timetuple())) * 1000
+        activity_details['date'] = activity_details['datetime'].date().strftime('%m/%d/%Y')
+        act_list.append(activity_details)
+
+    if request.method == 'GET':
+        if request.args.get('loadActivityID') is not None:
+            print(request.args['loadActivityID'])
+            user_activity = db.get_user_activity(activity_id=request.args['loadActivityID'])
+
+            users = []
+            for record in user_activity:
+                user = db.get_user(user_id=record['userid'], select='id, uname')[0]
+                user['approved'] = record['isApplicant']
+                users.append(user)
+            print(users)
+            return jsonify(users=users)
+
+    return render_template('RostersPage.html', user=user_info, activities=act_list,
+                           maps_key=utilities.get_key('google_maps'))
 
 @app.route('/logout')
 def logout():
     if session.get('user_id', None) is None:
         return redirect(url_for('main_page'))
     session.clear()
-    return main_page()
+    return redirect(url_for('main_page'))
 
 
 if __name__ == '__main__':
