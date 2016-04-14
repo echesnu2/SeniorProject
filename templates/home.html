@@ -12,7 +12,7 @@
 {% include "partials/navbar_partial.html" %}
 <div class="row">
 {% include "partials/sidebar_partial.html" %}
-    <div class="s6 main-content" align="center">
+    <div class=" col l10 m9 s12 offset-l2 offset-m3 main-content center">
         <!-- Teal page content  -->
               <br>
               <br>
@@ -22,11 +22,11 @@
               <br>
 
 
-            <button class="btn-floating" onclick='goToCalender()' onmouseover="changeText()" onmouseout="changeBack()">
+            <button class="btn-floating z-depth-3" onclick='goToCalender()' onmouseover="changeText()" onmouseout="changeBack()">
                  <p class="flow-text button_text waves-effect"> JOIN ACTIVITY</p>
             </button>
 
-            <button class="btn-floating" onclick='goToCreateActivity()' onmouseover="changeText()" onmouseout="changeBack()">
+            <button class="btn-floating z-depth-3" onclick='goToCreateActivity()' onmouseover="changeText()" onmouseout="changeBack()">
                  <p class="flow-text button_text waves-effect"> CREATE ACTIVITY</p>
             </button>
 
@@ -47,38 +47,14 @@
 
     function goToCalender(){
         var url = window.location.hash;
-        url += '/calendar';
+        url += '{{ url_for('search') }}';
         window.location.replace(url)
     }
 
     function goToCreateActivity(){
         var url = window.location.hash;
-        url += '/create_event';
+        url += '{{ url_for('create_event') }}';
         window.location.replace(url)
     }
-
-    function adjustStyle(width) {
-        width = parseInt(width);
-        if (width < 600) {
-            $(".sidebar").css("position", "relative");
-            $(".btn-floating").css("width", "95%");
-            $(".btn-floating").css("border-radius", "5%");
-            $(".btn-floating").css("margin-left", "0");
-            $(".main-content").css("margin-left", "0");
-
-
-        } else {
-            $(".sidebar").css("position", "fixed");
-            $(".btn-floating").css("width", "20em");
-            $(".btn-floating").css("border-radius", "20%");
-            $(".btn-floating").css("margin-top", "2em");
-        }
-    }
-    $(function () {
-        adjustStyle($(this).width());
-        $(window).resize(function () {
-            adjustStyle($(this).width());
-        });
-    });
 </script>
 {% endblock content %}

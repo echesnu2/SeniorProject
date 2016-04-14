@@ -1,153 +1,203 @@
 {% extends "template.html" %}
 {% block header %}
-{{ super() }}
+    {{ super() }}
 {% endblock header %}
 {% block content %}
+    <link rel="stylesheet" href="../static/css/create_event-style.css">
+    <link rel="stylesheet" href="../static/css/materialize.clockpicker.css">
 
-<!--Import CSS for home and profile page-->
-<link id="size-stylesheet" rel="stylesheet" href="../static/css/create_event-style.css">
+    {% include "partials/navbar_partial.html" %}
 
-{% include "partials/navbar_partial.html" %}
-<div class="row">
-{% include "partials/sidebar_partial.html" %}
+    <div class="row">
+        {% include "partials/sidebar_partial.html" %}
 
-    <div class="create-event-area col l10 m9 s12 right card-panel">
+        <div class="create-event-area col sl2 m9 right">
 
-        <div class="row">
-            <h2 class="white-text center-align">Create Event</h2>
-        </div>
+            <div class="row">
+                <h2 class="white-text center-align">Create Event</h2>
+            </div>
 
-        <div class="row">
-            <form class="col s12" method="post">
-                <div class="row">
-                    <div class="input-field col s8 white-text">
-                        <input id="activity_input" type="text" class="validate">
-                        <label for="activity_input">Activity Name</label>
+            <div class="row">
+                <form class="col s12" method="post">
+                    <div class="row">
+                        <div class="input-field col s12 m5 white-text">
+                            <input id="activity_input" type="text" name='activity-name' class="validate">
+                            <label for="activity_input">Activity Name</label>
+                        </div>
+                        <div class="input-field col s12 m4 white-text">
+                            <select name="category">
+                                {% for category in categories %}
+                                    <option value="{{ category['id'] }}">{{ category['category_name'] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label>Category</label>
+                        </div>
+                        <div class="input-field col s12 push-s4 center m3 public-private">
+                            <div class="switch">
+                                <label>
+                                    Public
+                                    <input class="private-switch" type="checkbox" onclick="privateSwitchOnChange(this)">
+                                    <span class="lever"></span>
+                                    Private
+                                </label>
+                            </div>
+                            <input class="private-switch-value" type='text' value='0' name='private' hidden>
+                        </div>
                     </div>
-                    <div class="input-field col s4 white-text">
-                        <select>
-                            <option value="" disabled selected>Choose your option</option>
-                            <option value="1">Football</option>
-                            <option value="2">Soccer</option>
-                            <option value="3">Tennis</option>
-                        </select>
-                        <label>Category</label>
-                    </div>
-                    <div class="input-field col s2 white-text">
-                        <input id="time_input" type="text" class="validate">
-                        <label for="time_input">Time</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col s12 map-container">
-                        <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-                        <div id="map"></div>
-                    </div>
-                </div>
 
-                <p class="flow-text">
-                    <button class="btn" onclick="postActivity()">Create Event</button>
-                </p>
-            </form>
+                    <div class="row">
+                        <div class="input-field col s5 m5 white-text">
+                            <input id="time_input" name="date" type="date" class="datepicker">
+                            <label for="time_input">When</label>
+                        </div>
+                        <div class="input-field col s4 m3 white-text">
+                            <input id="time_input" name="time" type="text" class="timepicker">
+                            <label for="time_input">Time</label>
+                        </div>
+                        <div class="input-field col s3 m3 white-text">
+                            <input id="time_input" name="duration" type="number" class="validate" min="0" type="number"
+                                   oninput="validity.valid || (value = '')">
+                            <label for="time_input">Duration (in minutes)</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col s12 map-container">
+                            <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+                            <div id="map"></div>
+                        </div>
+                    </div>
+
+                    <div class="row white-text">
+                        <div class="col s5 m4 input-field">
+                            <input id="num-of-players" name="num-of-players" min="0" type="number"
+                                   oninput="validity.valid || (value = '')" class="validate">
+                            <label for="num-of-players">Number of People</label>
+                        </div>
+
+                        <div class="col s7 m4 push-m4 input-field">
+                            <select id="skill-level" name="skill-level">
+                                <option value="0" selected>Any</option>
+                                <option value="1" selected>Beginner</option>
+                                <option value="2" selected>Intermediate</option>
+                                <option value="3" selected>Expert</option>
+                                <option value="4" selected>Master</option>
+                            </select>
+                            <label for="skill-level">Skill Level</label>
+                        </div>
+                    </div>
+
+                    <div class="row center">
+                        <button class="btn-large waves-effect waves-light" type="submit" name="action">Submit</button>
+                    </div>
+                    <label>
+                        <input type="text" id="lat" name="lat" hidden>
+                        <input type="text" id="lng" name="lng" hidden>
+                    </label>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-    $(document).ready(function () {
-        $('select').material_select();
-    });
-
-    function postActivity(){
-
-    }
-
-    function adjustStyle(width) {
-        width = parseInt(width);
-        if (width < 600) {
-            $(".sidebar").css("position", "relative");
-        } else {
-            $(".sidebar").css("position", "fixed");
-        }
-    }
-
-    $(function () {
-        adjustStyle($(this).width());
-        $(window).resize(function () {
-            adjustStyle($(this).width());
-        });
-    });
-
-//Atrium building, KSU Marietta Campus Lat: 33.937929, Lng: -84.520143
-
-    function initAutocomplete() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 33.937929, lng: -84.520143},
-            zoom: 13,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
+    <script src="../static/js/materialize.clockpicker.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('select').material_select();
+            $('private-switch').checked = false;
         });
 
-        // Create the search box and link it to the UI element.
-        var input = document.getElementById('pac-input');
-        var searchBox = new google.maps.places.SearchBox(input);
-        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-        // Bias the SearchBox results towards current map's viewport.
-        map.addListener('bounds_changed', function () {
-            searchBox.setBounds(map.getBounds());
+        $('.datepicker').pickadate({
+            selectMonths: true, // Creates a dropdown to control month
+            selectYears: 15 // Creates a dropdown of 15 years to control year
         });
 
-        var markers = [];
-        // Listen for the event fired when the user selects a prediction and retrieve
-        // more details for that place.
-        searchBox.addListener('places_changed', function () {
-            var places = searchBox.getPlaces();
+        $('.timepicker').pickatime({
+            twelvehour: true,
+            donetext: 'Done',
+            autoclose: true
+        });
 
-            if (places.length == 0) {
-                return;
+        function privateSwitchOnChange(swtch){
+            if(swtch.checked) {
+                $('.private-switch-value').val("1")
             }
+            else {
+                $('.private-switch-value').val("0")
+            }
+        }
 
-            // Clear out the old markers.
-            markers.forEach(function (marker) {
-                marker.setMap(null);
+        function initAutocomplete() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: -33.8688, lng: 151.2195},
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
             });
-            markers = [];
 
-            // For each place, get the icon, name and location.
-            var bounds = new google.maps.LatLngBounds();
-            places.forEach(function (place) {
-                var icon = {
-                    url: place.icon,
-                    size: new google.maps.Size(10, 10),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(5, 10),
-                    scaledSize: new google.maps.Size(5, 5)
-                };
+            // Create the search box and link it to the UI element.
+            var input = document.getElementById('pac-input');
+            var searchBox = new google.maps.places.SearchBox(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-                // Create a marker for each place.
-                markers.push(new google.maps.Marker({
-                    map: map,
-                    icon: icon,
-                    title: place.name,
-                    position: place.geometry.location
-                }));
+            // Bias the SearchBox results towards current map's viewport.
+            map.addListener('bounds_changed', function () {
+                searchBox.setBounds(map.getBounds());
+            });
 
-                if (place.geometry.viewport) {
-                    // Only geocodes have viewport.
-                    bounds.union(place.geometry.viewport);
-                } else {
-                    bounds.extend(place.geometry.location);
+            var markers = [];
+            // Listen for the event fired when the user selects a prediction and retrieve
+            // more details for that place.
+            searchBox.addListener('places_changed', function () {
+                var places = searchBox.getPlaces();
+
+                if (places.length == 0) {
+                    return;
                 }
 
+                // Clear out the old markers.
+                markers.forEach(function (marker) {
+                    marker.setMap(null);
+                });
+                markers = [];
+
+                // For each place, get the icon, name and location.
+                var bounds = new google.maps.LatLngBounds();
+                places.forEach(function (place) {
+                    var icon = {
+                        url: place.icon,
+                        size: new google.maps.Size(71, 71),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(17, 34),
+                        scaledSize: new google.maps.Size(25, 25)
+                    };
+
+                    // Create a marker for each place.
+                    markers.push(new google.maps.Marker({
+                        map: map,
+                        icon: icon,
+                        title: place.name,
+                        position: place.geometry.location
+                    }));
+
+                    if (place.geometry.viewport) {
+                        // Only geocodes have viewport.
+                        bounds.union(place.geometry.viewport);
+                    } else {
+                        bounds.extend(place.geometry.location);
+                    }
+
+                });
+
+                map.fitBounds(bounds);
+
+                if (markers.length == 1) {
+                    $('#lat').val(markers[0].position.lat());
+                    $('#lng').val(markers[0].position.lng());
+                }
             });
+        }
 
-            map.fitBounds(bounds);
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ key }}&libraries=places&callback=initAutocomplete"
+    ></script>
 
-
-        });
-    }
-
-</script>
-<script src="https://maps.googleapis.com/maps/api/js?key={{ key }}&libraries=places&callback=initAutocomplete"
-        async defer></script>
-{% endblock content %}
+{% endblock %}

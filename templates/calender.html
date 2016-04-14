@@ -1,0 +1,109 @@
+
+
+{% extends "template.html" %}
+{% block header %}
+{{ super() }}
+{% endblock header %}
+{% block content %}
+
+<!--Import CSS for home and profile page-->
+<link id="size-stylesheet" rel="stylesheet" href="../static/css/calender-style.css">
+
+{% include "partials/navbar_partial.html" %}
+
+<div class="row">
+{% include "partials/sidebar_partial.html" %}
+
+    <div class="col l10 m9 s12 offset-l2 offset-m3 offset-s0 main-content">
+    <p class="flow-text"><h2 align="center">{{ month }} {{ date.year }}</h2>
+
+        <table class="bordered centered striped">
+        <th>S</th><th>M</th><th>T</th><th>W</th><th>Th</th><th>F</th><th>S</th>
+        {% for week in date %}
+            <tr>
+                {% for day in week %}
+                    <div id="activity-modal-{{ day }}" class="modal bottom-sheet">
+                        <div class="modal-content {{ day }}-modal-content">
+                          <h4>Activities on {{ day }}</h4>
+                        </div>
+                    </div>
+                    <td id="day_{{ day }}"
+                        {% for activity in activities%}
+                            {% if activity['datetime'].day == day.day %}
+                                class="green lighten-1">
+                                <script>
+                                    $(document).ready(function () {
+                                        $('#day_{{ day }}').find('a').prop("href", "#activity-modal-{{ day }}");
+                                        $('#day_{{ day }}').find('a').prop("class", "modal-trigger");
+                                        $('.{{ day }}-modal-content').append(
+                                                '<div class="card blue lighten-1"> ' +
+                                                '<div class="card-content white-text"> ' +
+                                                '<span class="card-title">{{ activity.activity_name }}</span> ' +
+                                                '<h6 id="{{ address }}-{{ activity.activity_id }}">' +
+                                                setAddress({{ activity.latitude | float}}, {{ activity.longitude | float}}, "{{ address }}-{{ activity.activity_id }}") +
+                                                '</h6><h6>From ' + getTimeFromDateTime ({{ activity['time'] }}, {{ activity['duration'] }}) + '</h6></div> ' +
+                                                '</div>'
+                                        )
+                                    });
+                                </script>
+                                <dummy-tag
+                            {% endif %}
+                        {% endfor %} ><a href=""><h5>{{ day.day }}</h5></a>
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('.modal-trigger').leanModal();
+
+    });
+
+    function getTimeFromDateTime(datetime, duration) {
+        var rawStartTime = new Date(datetime);
+        var rawEndTime = new Date(datetime + (duration * 60000));
+
+        var startHours = Number(rawStartTime.getHours());
+        var startMinutes = Number(rawStartTime.getMinutes());
+        var endHours = Number(rawEndTime.getHours());
+        var endMinutes = Number(rawEndTime.getMinutes());
+
+        var startTime = "" + ((startHours >12) ? startHours - 12 : startHours);
+        startTime += (startMinutes < 10) ? ":0" + startMinutes : ":" + startMinutes;
+        startTime += (startHours >= 12) ? " P.M." : " A.M.";
+        var endTime = "" + ((endHours >12) ? endHours - 12 : endHours);
+        endTime += (endMinutes < 10) ? ":0" + endMinutes : ":" + endMinutes;
+        endTime += (endHours >= 12) ? " P.M." : " A.M.";
+
+        return startTime + " to " + endTime;
+    }
+
+    var geocoder;
+
+    function initGeocoder() {
+        geocoder = new google.maps.Geocoder;
+      }
+
+    function setAddress(lat, lng, id) {
+        var latlng = new google.maps.LatLng(lat, lng);
+
+        geocoder.geocode({
+            'latLng': latlng
+        }, function (results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    $('#' + id).text("Address: " + results[0].formatted_address.toString());
+                }
+            }
+        });
+    }
+</script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&callback=initGeocoder"
+    ></script>
+{% endblock content %}

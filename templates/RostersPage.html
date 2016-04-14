@@ -1,47 +1,182 @@
 {% extends "template.html" %}
 {% block header %}
-{{ super() }}
+    {{ super() }}
 {% endblock header %}
 {% block content %}
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"
+            integrity="sha256-xNjb53/rY+WmG+4L6tTl9m6PpqknWZvRt0rO1SRnJzw=" crossorigin="anonymous"></script>
+    <!-- Link to Results page css-->
+    <link id="results-stylesheet" rel="stylesheet" href="../static/css/rosters-page-style.css">
+    {% include "partials/navbar_partial.html" %}
 
- <!-- Link to Results page css-->
-<link id="results-stylesheet" rel="stylesheet" href="../static/css/ResultsPage.css">
+    <div class="row">
+        {% include "partials/sidebar_partial.html" %}
+        <div class="col l9 offset-m3 offset-l3" id="rostersContent">
+            <div class="row" id="container">
+                <div class="col s12 center white-text">
+                    <h1>Rosters</h1>
+                </div>
 
-{% include "partials/navbar_partial.html" %}
-<div class="row">
-{% include "partials/sidebar_partial.html" %}
-{% include "partials/searchFilter_partial.html" %}
-</div>
+                <div class="col l7 s12 eventList cyan darken-2 z-depth-2">
+                    <div class="row" id="selectable-activities">
+                        {% for activity in activities %}
+                            <div class="col s12">
+                                <div class="card cyan darken-1">
+                                    <div class="card-content white-text">
+                                        <span class="card-title">{{ activity.activity_name }}</span>
+                                        <h6 id="{{ activity.activity_id }}-activity-address" class="activity-address">
+                                            <script>
+                                                $(document).ready(function () {
+                                                    setAddress({{ activity.latitude | float}}, {{ activity.longitude | float}}, "{{ activity.activity_id }}-activity-address")
+                                                });
+                                            </script>
+                                        </h6>
+                                        <h6 id="{{ activity.activity_id }}-activity-time">
+                                            <script>
+                                                $(document).ready(function () {
+                                                    $('#{{ activity.activity_id }}-activity-time').text(getTimeFromDateTime({{ activity['time'] }}, {{ activity['duration'] }}))
+                                                });
+                                            </script>
+                                        </h6>
+                                        <h6>{{ activity.date }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
 
-<div class="row">
-{% include "partials/searchFilter_partial.html" %}
-</div>
+                <div class="col l3 offset-l1 s12">
+                    <div class="row">
+                        <div class="col s12 white-text" align="center">
+                            <h4>Add Players</h4>
+                        </div>
+                    </div>
 
-<script>
-    function adjustStyle(width) {
-        width = parseInt(width);
-        if (width < 600) {
-            $(".sidebar").css("position", "relative");
-        } else {
-            $(".sidebar").css("position", "fixed");
-        }
-    }
+                        <div class="row">
+                            <div class="col s12 playerList cyan darken-2 z-depth-2">
+                                <form method="get">
+                                    <ul class="unapproved-list">
+                                    </ul>
+                                </form>
+                            </div>
+                        </div>
 
-    $(function () {
-        adjustStyle($(this).width());
-        $(window).resize(function () {
-            adjustStyle($(this).width());
+                        <div class="row" align="center">
+                            <a class="waves-effect waves-light btn">Add</a>
+                        </div>
+
+                        <div class="col s12 white-text" align="center">
+                            <h4>Current Players</h4>
+                        </div>
+
+                        <div class="row">
+                        <div class="col s12 playerList cyan darken-2 z-depth-2">
+                            <ul class="approved-list">
+                            </ul>
+                        </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col s12" align="center">
+                                <a class="waves-effect waves-light btn">Kick</a>
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        $(function () {
+            $("#selectable-activities").selectable({
+                selected: function (event, ui) {
+                    cardDiv = ui.selected;
+                    item = $(cardDiv).find('.activity-address');
+                    itemID = item.attr('id');
+                    activityID = itemID.replace(/-activity-address/, '');
+
+
+                    $('.unapproved-list').empty();
+                    $('.approved-list').empty();
+
+                    unapprovedList = [];
+                    approvedList = [];
+                    $.getJSON('{{ url_for('rosters') }}', {loadActivityID: activityID}).done(function (json) {
+                        $.each(json.users, function (index, value) {
+                            if(value.approved == 1){
+                                approvedList.push('<li><a href="#!"><div class="flow-text white-text"><span>' + value.uname + '</span>' +
+                                        '</div><input hidden name="user-id" value="' + value.id +'"> </a></li>');
+                            }
+                            else{
+                                unapprovedList.push('<li><a href="#!"><div class="flow-text white-text"><span>' + value.uname + '</span>' +
+                                        '</div><input hidden name="user-id" value="' + value.id +'"> </a></li>');
+                            }
+                        })
+
+                        $('.unapproved-list').append(unapprovedList.join(''));
+                        $('.approved-list').append(approvedList.join(''))
+                    })
+                },
+                selecting: function (event, ui) {
+                    if ($(".ui-selected, .ui-selecting").length > 1) {
+                        $(ui.selecting).removeClass("ui-selecting");
+                    }
+                }
+            });
         });
-    });
 
-    $('.datepicker').pickadate({
-        selectMonths: true, // Creates a dropdown to control month
-    });
+        $('.datepicker').pickadate({
+            selectMonths: true, // Creates a dropdown to control month
+        });
 
-    $(document).ready(function() {
-        $('select').material_select();
-    });
-</script>
+        $(document).ready(function () {
+            $('select').material_select();
+        });
 
-{% include "partials/resultsDiv_js.html" %}
+
+        function getTimeFromDateTime(datetime, duration) {
+            var rawStartTime = new Date(datetime);
+            var rawEndTime = new Date(datetime + (duration * 60000));
+
+            var startHours = Number(rawStartTime.getHours());
+            var startMinutes = Number(rawStartTime.getMinutes());
+            var endHours = Number(rawEndTime.getHours());
+            var endMinutes = Number(rawEndTime.getMinutes());
+
+            var startTime = "" + ((startHours > 12) ? startHours - 12 : startHours);
+            startTime += (startMinutes < 10) ? ":0" + startMinutes : ":" + startMinutes;
+            startTime += (startHours >= 12) ? " P.M." : " A.M.";
+            var endTime = "" + ((endHours > 12) ? endHours - 12 : endHours);
+            endTime += (endMinutes < 10) ? ":0" + endMinutes : ":" + endMinutes;
+            endTime += (endHours >= 12) ? " P.M." : " A.M.";
+
+            return startTime + " to " + endTime;
+        }
+
+        var geocoder;
+
+        function initGeocoder() {
+            geocoder = new google.maps.Geocoder;
+        }
+
+        function setAddress(lat, lng, id) {
+            var latlng = new google.maps.LatLng(lat, lng);
+
+            geocoder.geocode({
+                'latLng': latlng
+            }, function (results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    if (results[0]) {
+                        $('#' + id).text(results[0].formatted_address.toString());
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ maps_key }}&callback=initGeocoder"
+    ></script>
+
 {% endblock content %}

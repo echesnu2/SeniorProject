@@ -10,14 +10,17 @@
 {% include "partials/navbar_partial.html" %}
 <div class="row">
     {% include "partials/sidebar_partial.html" %}
-    <div class="col l10 offset-l2">
-        <div class="container">
+    <div class="col l10 offset-l2" align="center">
+        <div class="" id="searchContents">
             {% include "partials/searchFilter_partial.html" %}
             <div class="row">
-                <div class="col l12" id="result">
+                <div class="col l12">
                     <ul class="collapsible" data-collapsible="accordion">
-                        {% include "partials/resultsDiv_partial.html" %}
-                        {% include "partials/resultsDiv_partial.html" %}
+                    {% if results is not none %}
+                        {% for record in results %}
+                            {% include "partials/resultsDiv_partial.html" %}
+                        {% endfor %}
+                    {% endif %}
                     </ul>
                 </div>
             </div>
@@ -51,5 +54,5 @@
     });
 </script>
 
-{% include "partials/resultsDiv_js.html" %}
+<script src="../static/js/resultsDiv.js"></script>
 {% endblock content %}

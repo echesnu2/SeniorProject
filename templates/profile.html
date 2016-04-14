@@ -10,9 +10,9 @@
 {% include "partials/navbar_partial.html" %}
 <div class="row">
 {% include "partials/sidebar_partial.html" %}
-
+    <div class="col s10 offset-l2">
     <div class="profile">
-        <form class="col s12 profile-content" method="post" action="{{ url_for('profile') }}">
+        <form class="col s12 profile-content z-depth-3" style="margin-top: 5em;" method="post" action="{{ url_for('profile') }}">
           <div class="input-field col s12">
               <h5 class="center grey-text">{{ user[0]['uname'] + "\'s profile" }}</h5>
               <br>
@@ -61,6 +61,7 @@
         </form>
     </div>
 
+</div>
 </div>
 
 <script>
